@@ -1,0 +1,36 @@
+{
+  "name": "steam-game-center",
+  "version": "0.1.0",
+  "description": "CSSE333-01 Databases - Steam Game Center",
+  "main": "main.js",
+  "scripts": {
+	"start": "electron ."
+  },
+  "devDependencies": {
+	"electron": "^7.1.9"
+  },
+  "contributors": [
+	{
+	  "name": "Cooper Anderson",
+	  "email": "andersc7@rose-hulman.edu",
+	  "url": "https://ampersand.ninja/"
+	},
+	{
+	  "name": "Garrett Buccelli",
+	  "email": "buccelgt@rose-hulman.edu"
+	},
+	{
+	  "name": "Joseph Peters",
+	  "email": "petersjl@rose-hulman.edu"
+	}
+  ],
+  "license": "ISC",
+  "repository": {
+	"type": "git",
+	"url": "git+https://github.com/cooper-csse/SteamGameCenter.git"
+  },
+  "bugs": {
+	"url": "https://github.com/cooper-csse/SteamGameCenter/issues"
+  },
+  "homepage": "https://github.com/cooper-csse/SteamGameCenter#readme"
+}
