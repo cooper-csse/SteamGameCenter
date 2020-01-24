@@ -10,7 +10,11 @@ const createMainWindow = async () => {
 		show: false,
 		width: 600,
 		height: 400,
-		backgroundColor: "#424242"
+		backgroundColor: "#424242",
+		webPreferences: {
+			nodeIntegration: true,
+			nodeIntegrationInWorker: true
+		}
 	});
 
 	win.on('ready-to-show', () => {

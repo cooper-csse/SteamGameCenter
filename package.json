@@ -1,36 +1,42 @@
 {
-  "name": "steam-game-center",
-  "version": "0.1.0",
-  "description": "CSSE333-01 Databases - Steam Game Center",
-  "main": "main.js",
-  "scripts": {
-	"start": "electron ."
-  },
-  "devDependencies": {
-	"electron": "^7.1.9"
-  },
-  "contributors": [
-	{
-	  "name": "Cooper Anderson",
-	  "email": "andersc7@rose-hulman.edu",
-	  "url": "https://ampersand.ninja/"
+	"name": "steam-game-center",
+	"version": "0.1.0",
+	"description": "CSSE333-01 Databases - Steam Game Center",
+	"main": "main.js",
+	"scripts": {
+		"start": "electron ."
 	},
-	{
-	  "name": "Garrett Buccelli",
-	  "email": "buccelgt@rose-hulman.edu"
+	"dependencies": {
+		"jquery": "^3.4.1",
+		"bootstrap": "^4.4.1",
+		"popper.js": "^1.16.1",
+		"mysql": "^2.17.1"
 	},
-	{
-	  "name": "Joseph Peters",
-	  "email": "petersjl@rose-hulman.edu"
-	}
-  ],
-  "license": "ISC",
-  "repository": {
-	"type": "git",
-	"url": "git+https://github.com/cooper-csse/SteamGameCenter.git"
-  },
-  "bugs": {
-	"url": "https://github.com/cooper-csse/SteamGameCenter/issues"
-  },
-  "homepage": "https://github.com/cooper-csse/SteamGameCenter#readme"
+	"devDependencies": {
+		"electron": "^7.1.9"
+	},
+	"contributors": [
+		{
+			"name": "Cooper Anderson",
+			"email": "andersc7@rose-hulman.edu",
+			"url": "https://ampersand.ninja/"
+		},
+		{
+			"name": "Garrett Buccelli",
+			"email": "buccelgt@rose-hulman.edu"
+		},
+		{
+			"name": "Joseph Peters",
+			"email": "petersjl@rose-hulman.edu"
+		}
+	],
+	"license": "ISC",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/cooper-csse/SteamGameCenter.git"
+	},
+	"bugs": {
+		"url": "https://github.com/cooper-csse/SteamGameCenter/issues"
+	},
+	"homepage": "https://github.com/cooper-csse/SteamGameCenter#readme"
 }
