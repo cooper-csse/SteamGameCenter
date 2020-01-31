@@ -10,6 +10,7 @@ const createMainWindow = async () => {
 		show: false,
 		width: 600,
 		height: 400,
+		autoHideMenuBar: true,
 		backgroundColor: "#424242",
 		webPreferences: {
 			nodeIntegration: true,
@@ -55,5 +56,4 @@ app.on('activate', async () => {
 	await app.whenReady();
 	mainWindow = await createMainWindow();
 	mainWindow.webContents.toggleDevTools();
-	mainWindow.setMenu(null);
 })();

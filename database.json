@@ -1,0 +1,9 @@
+{
+	"server": "golem.csse.rose-hulman.edu",
+	"database": "SteamGameCenter20",
+	"user": "SodaBaseUserandersc720",
+	"password": "",
+	"options": {
+		"enableArithAbort": true
+	}
+}
