@@ -6,9 +6,69 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<link rel="stylesheet" href="lib/bootstrap/css/darkly.min.css">
 	<script src="lib/fontawesome/js/fontawesome.js"></script>
+	<link rel="stylesheet" href="css/index.css">
 	<script src="js/menu.js"></script>
 </head>
-<body>
-	<a href="index.html"><div class="btn btn-primary">Logout</div></a>
+<body style="margin-top: 53px;">
+	<nav class="navbar navbar-dark bg-dark fixed-top">
+		<a href="index.html"><div class="btn btn-sm btn-outline-danger">Logout</div></a>
+		<button class="btn btn-sm btn-outline-success" data-toggle="modal" data-target="#search-modal"><i class="fas fa-xs fa-search"></i></button>
+	</nav>
+	<div class="modal fade" tabindex="-1" role="dialog" id="search-modal">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Search</h5>
+				</div>
+				<form>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="search-title">Title</label>
+							<input type="text" class="form-control" id="search-title">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<h5><span id="signup-error" class="badge badge-danger"></span></h5>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal" id="search-cancel">Close</button>
+						<button type="submit" class="btn btn-primary" id="search-submit">Search</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" tabindex="-1" role="dialog" id="game-modal">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="game-title"></h5>
+					<h5><span class="badge badge-secondary" id="game-date"></span></h5>
+				</div>
+				<form>
+					<div class="modal-body">
+						<div id="game-description"></div>
+					</div>
+					<div class="modal-footer">
+						<h5><span class="badge badge-success" id="game-sale"></span></h5>
+						<h5><span class="badge badge-secondary" id="game-price"></span></h5>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal" id="game-cancel">Close</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="table-div">
+		<table class="table table-hover table-sm">
+			<thead class="thead-dark">
+				<tr>
+					<th scope="col">Title</th>
+					<th scope="col">Price</th>
+					<th scope="col">Sale</th>
+					<th scope="col">Release</th>
+				</tr>
+			</thead>
+			<tbody id="game-list"></tbody>
+		</table>
+	</div>
+	<script src="js/menu.js"></script>
 </body>
 </html>

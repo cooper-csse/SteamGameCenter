@@ -19,6 +19,14 @@ div.col-sm {
 	pointer-events: none;
 }
 
+.navbar {
+	padding: 8px;
+}
+
+.table-div {
+	margin: 8px;
+}
+
 * {
 	-webkit-user-select: none;
 	-webkit-touch-callout: none;

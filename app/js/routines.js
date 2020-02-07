@@ -38,4 +38,28 @@ module.exports = {
 			console.error('SQL error', e);
 		}
 	},
+	getGames: async function() {
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(`SELECT * FROM Game`);
+			return await result.then(res => {
+				return res;
+			});
+		} catch (e) {
+			console.error('SQL error', e);
+		}
+	},
+	getGameDetails: async function(id) {
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(`SELECT * FROM Game WHERE ID='${id}'`);
+			return await result.then(res => {
+				return res;
+			});
+		} catch (e) {
+			console.error('SQL error', e);
+		}
+	}
 };
