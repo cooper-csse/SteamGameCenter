@@ -235,6 +235,15 @@ $("#search-submit").on("click", e => {
 		developers: getCheckedList(searchData.developers),
 		publishers: getCheckedList(searchData.publishers)
 	};
+	for (let str of [data.date.from, data.date.to]) {
+		let seg = str.split('-');
+		if (seg.length !== 3) return;
+		if (seg[0].length !== 4 || seg[1].length !== 2 || seg[2].length !== 2) return;
+		if (isNaN(seg[0]) || isNaN(seg[1]) || isNaN(seg[2])) return;
+		if (Number(seg[0]) < 0 || Number(seg[0]) > 9999) return;
+		if (Number(seg[1]) < 0 || Number(seg[1]) > 12) return;
+		if (Number(seg[2]) < 0 || Number(seg[2]) > 31) return;
+	}
 	db.advancedSearch(data).then(result => {
 		displayGames(result.recordset);
 	})

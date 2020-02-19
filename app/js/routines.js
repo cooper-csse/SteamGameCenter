@@ -1,4 +1,3 @@
-// const sql = require("mssql");
 const pool = require("electron").remote.require("./pool");
 
 function verify(params=[]) {
@@ -63,9 +62,6 @@ module.exports = {
 		try {
 			const request = pool.request();
 			const result = request.query(`SELECT * FROM GamesAlphabetical`);
-			// return await result.then(res => {
-			// 	return res;
-			// });
 			return await result;
 		} catch (e) {
 			console.error('SQL error', e);
