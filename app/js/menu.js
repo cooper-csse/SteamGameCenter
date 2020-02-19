@@ -45,7 +45,11 @@ searchData = {
 	publishers: $("#search-publishers")
 };
 
+oldGames = [];
+
 function displayGames(games) {
+	if (games === undefined) games = oldGames;
+	else oldGames = games;
 	db.getFollowing().then(result => {
 		let following = [];
 		for (let game of result.recordset) following.push(game.ID);
@@ -141,13 +145,13 @@ function reload() {
 
 function addFollowing(id="") {
 	db.addFollowing(id).then(result => {
-		reload();
+		displayGames();
 	});
 }
 
 function removeFollowing(id="") {
 	db.removeFollowing(id).then(result => {
-		reload();
+		displayGames();
 	});
 }
 
@@ -236,6 +240,7 @@ $("#search-submit").on("click", e => {
 		publishers: getCheckedList(searchData.publishers)
 	};
 	for (let str of [data.date.from, data.date.to]) {
+		if (str === "") continue;
 		let seg = str.split('-');
 		if (seg.length !== 3) return;
 		if (seg[0].length !== 4 || seg[1].length !== 2 || seg[2].length !== 2) return;
