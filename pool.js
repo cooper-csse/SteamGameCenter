@@ -6,4 +6,5 @@ const connection = pool.connect();
 pool.on('error', err => {});
 
 pool.connection = connection;
+pool.user = undefined;
 module.exports = pool;

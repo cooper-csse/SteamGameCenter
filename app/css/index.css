@@ -27,10 +27,73 @@ div.col-sm {
 	margin: 8px;
 }
 
+.fa-info {
+	margin-left: 2px;
+	margin-right: 2px;
+}
+
+.fa-align-justify {
+	margin-left: 1px;
+	margin-right: 1px;
+}
+
+.tag {
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+.search-heading {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+#search-developers-publishers {
+	margin-bottom: 0;
+}
+
+#search-developers-publishers>.col>.pre-scrollable {
+	max-height: 100px;
+	border-radius: 15px;
+	padding: 8px;
+}
+
+#search-tab-content {
+	max-height: 161px;
+	margin-top: 8px;
+	overflow-x: hidden;
+}
+
+#search-tag-add {
+	padding: 0 6px 1px 5px;
+}
+
+::-webkit-scrollbar {
+	width: 5px;
+}
+
+::-webkit-scrollbar-track {
+	background: #303030;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #00bc8c;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #ddd;
+}
+
 * {
 	-webkit-user-select: none;
 	-webkit-touch-callout: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+}
+
+.game-action {
+	padding-top: 0px;
+	padding-bottom: 1px;
+	padding-left: 6px;
+	padding-right: 6px;
 }

@@ -7,6 +7,8 @@ require("popper.js");
 let signupError = $("#signup-error");
 let loginError = $("#login-error");
 
+db.setUsername(undefined);
+
 $("button#signup").on("click", (e) => {
 	e.preventDefault();
 	signupError.html("");
@@ -30,9 +32,9 @@ $("button#signup-submit").on("click", (e) => {
 			signupError.removeClass(["badge-danger", "badge-warning"]);
 			signupError.addClass("badge-danger");
 			signupError.html(`User '${username}' could not be created`);
-		}
-		else {
+		} else {
 			db.addUser(username, password).then(res => {
+				db.setUsername(username);
 				window.location = "menu.html";
 			});
 		}
@@ -63,6 +65,7 @@ $("button#login-submit").on("click", (e) => {
 			loginError.addClass("badge-danger");
 			loginError.html("Incorrect username or password entered");
 		} else {
+			db.setUsername(username);
 			window.location = "menu.html";
 		}
 	});

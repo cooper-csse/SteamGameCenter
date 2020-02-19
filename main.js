@@ -55,5 +55,5 @@ app.on('activate', async () => {
 (async () => {
 	await app.whenReady();
 	mainWindow = await createMainWindow();
-	mainWindow.webContents.toggleDevTools();
+	// mainWindow.webContents.toggleDevTools();
 })();
