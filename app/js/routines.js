@@ -1,4 +1,5 @@
 const pool = require("electron").remote.require("./pool");
+const hashing = require("./hashing");
 
 function verify(params=[]) {
 	for (let param of params) {
@@ -36,9 +37,10 @@ module.exports = {
 		await pool.constructor;
 		try {
 			const request = pool.request();
-			const result = request.query(`SELECT * FROM Login WHERE Username='${username}' AND Password='${password}'`);
+			const result = request.query(`SELECT * FROM Login WHERE Username='${username}'`);
 			return await result.then(res => {
-				return res.recordset.length !== 0;
+				if (res.recordset.length === 0) return false;
+				return res.recordset[0].Password === hashing.hashPassword(password, res.recordset[0].Salt);
 			});
 		} catch (e) {
 			console.error('SQL error', e);
@@ -46,10 +48,12 @@ module.exports = {
 	},
 	addUser: async function(username, password) {
 		if (verify([username, password])) throw new Error("SQL injection");
+		let salt = hashing.generateSalt();
+		let hash = hashing.hashPassword(password, salt);
 		await pool.constructor;
 		try {
 			const request = pool.request();
-			const result = request.query(`INSERT INTO Login VALUES('${username}', '${password}', '')`);
+			const result = request.query(`INSERT INTO Login VALUES('${username}', '${hash}', '${salt}')`);
 			return await result.then(res => {
 				return res;
 			});
