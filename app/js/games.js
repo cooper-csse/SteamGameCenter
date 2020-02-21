@@ -14,6 +14,7 @@ gameData = {
 	title: $("#game-title"),
 	date: $("#game-date"),
 	description: $("#game-description"),
+	tags: $("#game-tags"),
 	price: $("#game-price"),
 	sale: $("#game-sale"),
 	publisher: $("#game-publisher"),
@@ -150,6 +151,37 @@ function clickTag(id) {
 	}
 }
 
+function clickGameTag(tag) {
+	let data = {
+		tag: tag,
+		date: {
+			from: "",
+			to: "",
+		},
+		price: {
+			from: "",
+			to: "",
+		},
+		sale: {
+			from: "",
+			to: "",
+		},
+		rating: {
+			positive: false,
+			good: false,
+			mixed: false,
+			bad: false,
+			negative: false,
+		},
+		developers: [],
+		publishers: []
+	};
+	db.advancedSearchGames(data).then(result => {
+		gameModal.modal("hide");
+		displayGames(result.recordset);
+	});
+}
+
 function showModal(id="") {
 	db.getGameDetails(id).then(result => {
 		let game = result.recordset[0];
@@ -184,7 +216,15 @@ function showModal(id="") {
 					else if (rating > 40 && rating <= 60) gameData.rating.html("Mixed");
 					else if (rating > 20 && rating <= 40) gameData.rating.html("Bad");
 					else if (rating >= 0 && rating <= 20) gameData.rating.html("Negative");
-					gameModal.modal();
+					db.getTagsForGame(game.ID).then(result => {
+						gameData.tags.empty();
+						for (let tag of result.recordset) {
+							gameData.tags.append(`
+								<button id="game-tag-${tag.ID}" type="button" class="tag btn btn-sm btn-outline-secondary shadow-none" onclick="clickGameTag('${tag.Name}')">${tag.Name}</button>
+							`);
+						}
+						gameModal.modal();
+					});
 				});
 			});
 		});

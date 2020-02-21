@@ -96,7 +96,7 @@ module.exports = {
 		await pool.constructor;
 		try {
 			const request = pool.request();
-			const result = request.query(`INSERT INTO Login VALUES('${username}', '${hash}', '${salt}', 0)`);
+			const result = request.query(`EXEC addUserLogin '${username}', '${hash}', '${salt}', ${0}`);
 			return await result.then(res => {
 				return res;
 			});
@@ -172,7 +172,7 @@ module.exports = {
 		await pool.constructor;
 		try {
 			const request = pool.request();
-			const result = request.query(`INSERT INTO FollowingGame VALUES('${user}', '${id}')`);
+			const result = request.query(`EXEC followGameID '${user}', '${id}'`);
 			return await result.then(res => {
 				return res;
 			});
@@ -186,7 +186,7 @@ module.exports = {
 		await pool.constructor;
 		try {
 			const request = pool.request();
-			const result = request.query(`DELETE FollowingGame WHERE Username='${user}' AND GameID='${id}'`);
+			const result = request.query(`EXEC unfollowGameID '${user}', '${id}'`);
 			return await result.then(res => {
 				return res;
 			});
@@ -216,7 +216,7 @@ module.exports = {
 		await pool.constructor;
 		try {
 			const request = pool.request();
-			const result = request.query(`INSERT INTO FollowingDev VALUES('${user}', '${id}')`);
+			const result = request.query(`EXEC followDevID '${user}', '${id}'`);
 			return await result.then(res => {
 				return res;
 			});
@@ -230,7 +230,7 @@ module.exports = {
 		await pool.constructor;
 		try {
 			const request = pool.request();
-			const result = request.query(`DELETE FollowingDev WHERE Username='${user}' AND DevID='${id}'`);
+			const result = request.query(`EXEC unfollowDevID '${user}', '${id}'`);
 			return await result.then(res => {
 				return res;
 			});
@@ -243,6 +243,23 @@ module.exports = {
 		try {
 			const request = pool.request();
 			const result = request.query(`SELECT * FROM TagsAlphabetical`);
+			return await result.then(res => {
+				return res;
+			});
+		} catch (e) {
+			throw new Error(e.message);
+		}
+	},
+	getTagsForGame: async function(id) {
+		if (verify([id])) throw new Error("SQL injection");
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(`
+				SELECT TagID AS [ID], Name
+					FROM Tag t
+					JOIN HasTag h ON t.ID = h.TagID AND h.GameID = '${id}'
+			`);
 			return await result.then(res => {
 				return res;
 			});
@@ -425,7 +442,6 @@ module.exports = {
 		return result;
 	},
 	importGame: async function (game) {
-		// if (verify([game.GameTitle, game.GamePrice, game.GameSale, game.GameRelease, game.GameDescription, game.DevName, game.DevAddress, game.PubName, game.LicenseStart, game.LicenseEnd, game.Tag, game.ReviewScore, game.ReviewDate, game.ReviewContent])) throw new Error("SQL injection");
 		await pool.constructor;
 		try {
 			const request = pool.request();
@@ -438,7 +454,6 @@ module.exports = {
 		}
 	},
 	importLogin: async function(login) {
-		// if (verify([login.Username, login.Password, login.Salt, login.Admin, login.FollowDev, login.FollowGame])) throw new Error("SQL injection");
 		await pool.constructor;
 		try {
 			const request = pool.request();
