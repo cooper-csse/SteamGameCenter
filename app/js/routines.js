@@ -3,7 +3,8 @@ const hashing = require("./hashing");
 
 function verify(params=[]) {
 	for (let param of params) {
-		if (param.includes(';') && (param.includes("'") || param.includes('"'))) {
+		//if (param.includes(';') && (param.includes("'") || param.includes('"'))) {
+		if (param.includes("'")) {
 			window.location = "catch.html";
 			return true;
 		}
@@ -84,7 +85,30 @@ module.exports = {
 			console.error('SQL error', e);
 		}
 	},
-	getFollowing: async function() {
+	getDevelopers: async function() {
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(`SELECT * FROM DeveloperData`);
+			return await result;
+		} catch (e) {
+			console.error('SQL error', e);
+		}
+	},
+	getDeveloperDetails: async function(id) {
+		if (verify([id])) throw new Error("SQL injection");
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(`SELECT * FROM DeveloperData WHERE ID='${id}'`);
+			return await result.then(res => {
+				return res;
+			});
+		} catch (e) {
+			console.error('SQL error', e);
+		}
+	},
+	getFollowingGame: async function() {
 		let user = pool.user;
 		await pool.constructor;
 		try {
@@ -100,7 +124,7 @@ module.exports = {
 			console.error('SQL error', e);
 		}
 	},
-	addFollowing: async function(id) {
+	addFollowingGame: async function(id) {
 		let user = pool.user;
 		if (verify([user, id])) throw new Error("SQL injection");
 		await pool.constructor;
@@ -114,13 +138,57 @@ module.exports = {
 			console.error('SQL error', e);
 		}
 	},
-	removeFollowing: async function(id) {
+	removeFollowingGame: async function(id) {
 		let user = pool.user;
 		if (verify([user, id])) throw new Error("SQL injection");
 		await pool.constructor;
 		try {
 			const request = pool.request();
 			const result = request.query(`DELETE FollowingGame WHERE Username='${user}' AND GameID='${id}'`);
+			return await result.then(res => {
+				return res;
+			});
+		} catch (e) {
+			console.error('SQL error', e);
+		}
+	},
+	getFollowingDev: async function() {
+		let user = pool.user;
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(`
+				SELECT d.ID, d.Name, d.Address, d.Games
+					FROM DeveloperData d
+					JOIN FollowingDev f on d.ID = f.DevID
+					WHERE f.Username='${user}'
+			`);
+			return await result;
+		} catch (e) {
+			console.error('SQL error', e);
+		}
+	},
+	addFollowingDev: async function(id) {
+		let user = pool.user;
+		if (verify([user, id])) throw new Error("SQL injection");
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(`INSERT INTO FollowingDev VALUES('${user}', '${id}')`);
+			return await result.then(res => {
+				return res;
+			});
+		} catch (e) {
+			console.error('SQL error', e);
+		}
+	},
+	removeFollowingDev: async function(id) {
+		let user = pool.user;
+		if (verify([user, id])) throw new Error("SQL injection");
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(`DELETE FollowingDev WHERE Username='${user}' AND DevID='${id}'`);
 			return await result.then(res => {
 				return res;
 			});
@@ -140,7 +208,7 @@ module.exports = {
 			console.error('SQL error', e);
 		}
 	},
-	getDevelopers: async function() {
+	getDevelopersAlphabetical: async function() {
 		await pool.constructor;
 		try {
 			const request = pool.request();
@@ -152,7 +220,7 @@ module.exports = {
 			console.error('SQL error', e);
 		}
 	},
-	getPublishers: async function() {
+	getPublishersAlphabetical: async function() {
 		await pool.constructor;
 		try {
 			const request = pool.request();
@@ -164,12 +232,12 @@ module.exports = {
 			console.error('SQL error', e);
 		}
 	},
-	basicSearch: async function(name) {
-		if (verify([name])) throw new Error("SQL injection");
+	basicSearchGames: async function(title) {
+		if (verify([title])) throw new Error("SQL injection");
 		await pool.constructor;
 		try {
 			const request = pool.request();
-			const result = request.query(`SELECT * FROM GamesAlphabetical WHERE Title LIKE '%${name}%'`);
+			const result = request.query(`SELECT * FROM GamesAlphabetical WHERE Title LIKE '%${title}%'`);
 			return await result.then(res => {
 				return res;
 			});
@@ -177,21 +245,18 @@ module.exports = {
 			console.error('SQL error', e);
 		}
 	},
-	advancedSearch: async function(data) {
-		if (verify(data.tags.concat(data.developers).concat(data.publishers).concat([data.date.from, data.date.to]))) throw new Error("SQL injection");
+	advancedSearchGames: async function(data) {
+		if (verify(data.developers.concat(data.publishers).concat([data.date.from, data.date.to, data.tag]))) throw new Error("SQL injection");
 		let query = `
 			SELECT g.ID, g.Title, g.Price, g.Sale, g.Release, g.Description
 				FROM Game g
-				JOIN Developer d ON g.Developer = d.ID
-				JOIN Publisher p on g.Publisher = p.ID
+				${data.developers.length > 0 ? "JOIN Developer d ON g.Developer = d.ID" : ""}
+				${data.publishers.length > 0 ? "JOIN Publisher p on g.Publisher = p.ID" : ""}
+				${data.tag !== "" ? "JOIN HasTag ht on g.ID = ht.GameID" : ""}
+				${data.tag !== "" ? "JOIN Tag t on ht.TagID = t.ID" : ""}
 		`;
 		let c = [];
-		// if (data.tags.length > 0) {
-		// 	let tagString = "";
-		// 	for (let i = 0; i < data.tags.length; i++) {
-		//
-		// 	}
-		// }
+		if (data.tag !== "") c.push(`t.Name = '${data.tag}'`);
 		if (data.date.from !== "") c.push(`g.Release >= '${data.date.from}'`);
 		if (data.date.to !== "") c.push(`g.Release <= '${data.date.to}'`);
 		if (data.price.from !== "") c.push(`g.Price >= '${data.price.from}'`);
@@ -207,7 +272,40 @@ module.exports = {
 			c.push('(' + publishers.join(" OR ") + ')');
 		}
 		if (c.length !== 0) query += ` WHERE ${c.join(" AND ")}`;
-		console.log(query);
+		query += " ORDER BY g.Title ASC";
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(query);
+			return await result.then(res => {
+				return res;
+			});
+		} catch (e) {
+			console.error('SQL error', e);
+		}
+	},
+	basicSearchDev: async function(name) {
+		if (verify([name])) throw new Error("SQL injection");
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(`SELECT * FROM DevelopersAlphabetical WHERE Name LIKE '%${name}%'`);
+			return await result.then(res => {
+				return res;
+			});
+		} catch (e) {
+			console.error('SQL error', e);
+		}
+	},
+	advancedSearchDev: async function(data) {
+		if (verify([data.address])) throw new Error("SQL injection");
+		let query = `SELECT * FROM DeveloperData`;
+		let c = [];
+		if (data.address !== "") c.push(`Address LIKE '${data.Address}'`);
+		if (data.games.from !== "") c.push(`Games >= '${data.games.from}'`);
+		if (data.games.to !== "") c.push(`Games <= '${data.games.to}'`);
+		if (c.length !== 0) query += ` WHERE ${c.join(" AND ")}`;
+		query += " ORDER BY Name ASC";
 		await pool.constructor;
 		try {
 			const request = pool.request();

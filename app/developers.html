@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Steam Game Center</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="stylesheet" href="lib/bootstrap/css/darkly.min.css">
+	<script src="lib/fontawesome/js/fontawesome.js"></script>
+	<link rel="stylesheet" href="css/index.css">
+	<link rel="stylesheet" href="css/sidebar.css">
+	<script src="js/developers.js"></script>
+</head>
+<body style="margin-top: 45px;">
+	<nav class="navbar navbar-dark bg-dark fixed-top">
+		<button class="btn btn-sm btn-outline-danger" id="menu-toggle"><i class="fas fa-xs fa-align-justify"></i></button>
+		<div>
+			<button id="reload" class="btn btn-sm btn-outline-info"><i class="fas fa-xs fa-redo"></i></button>
+			<button class="btn btn-sm btn-outline-success" data-toggle="modal" data-target="#search-modal"><i class="fas fa-xs fa-search"></i></button>
+		</div>
+	</nav>
+
+	<div class="d-flex" id="wrapper">
+		<div class="bg-dark border-right position-fixed" id="sidebar-wrapper">
+			<div class="list-group list-group-flush" style="text-align: center">
+				<a href="#" class="list-group-item list-group-item-action bg-dark">
+					<h4>Games</h4>
+					<div class="btn-group" role="group" aria-label="Basic example">
+						<button id="mode-game-browse" type="button" class="btn btn-sm btn-secondary">Browse</button>
+						<button id="mode-game-following" type="button" class="btn btn-sm btn-secondary">Following</button>
+					</div>
+				</a>
+				<a href="#" class="list-group-item list-group-item-action bg-dark">
+					<h4>Developers</h4>
+					<div class="btn-group" role="group" aria-label="Basic example">
+						<button id="mode-developer-browse" type="button" class="btn btn-sm btn-secondary">Browse</button>
+						<button id="mode-developer-following" type="button" class="btn btn-sm btn-secondary">Following</button>
+					</div>
+				</a>
+				<a class="list-group-item list-group-item-action bg-dark">
+					<button id="logout" class="btn btn-outline-danger">Logout</button>
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" tabindex="-1" role="dialog" id="search-modal">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-body">
+					<ul class="nav nav-tabs row" id="tabs-search" role="tablist" style="text-align: center">
+						<li class="nav-item col">
+							<a class="nav-link active" id="tabs-search-basic" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Basic Search</a>
+						</li>
+						<li class="nav-item col">
+							<a class="nav-link" id="tabs-search-advanced" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Advanced Search</a>
+						</li>
+					</ul>
+					<div class="tab-content pre-scrollable" id="search-tab-content">
+						<div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+							<div class="search-heading">
+								<div class="form-group">
+									<label for="search-name">Name</label>
+									<input type="text" class="form-control" id="search-name">
+								</div>
+							</div>
+						</div>
+						<div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+							<div class="form-group">
+								<div class="search-heading">
+									<div class="form-group">
+										<label for="search-address">Address</label>
+										<input type="text" class="form-control form-control-sm" id="search-address">
+									</div>
+								</div>
+								<div class="search-heading">
+									<label>Games</label>
+									<div class="input-group input-group-sm">
+										<div class="input-group-prepend"><span class="input-group-text">From</span></div>
+										<input id="search-games-from" placeholder="0" type="number" min="0" aria-label="From" class="form-control">
+										<div class="input-group-prepend"><span class="input-group-text">To</span></div>
+										<input id="search-games-to" placeholder="0" type="number" min="0" aria-label="To" class="form-control">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<h5><span id="signup-error" class="badge badge-danger"></span></h5>
+					<button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal" id="search-cancel">Close</button>
+					<button type="submit" class="btn btn-sm btn-primary" id="search-submit">Search</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" tabindex="-1" role="dialog" id="developer-modal">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="developer-name"></h5>
+					<h5><span class="badge badge-secondary" id="developer-games"></span></h5>
+				</div>
+				<form>
+					<div class="modal-body">
+						<div id="developer-address"></div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal" id="developer-cancel">Close</button>
+						<button type="button" class="btn btn-primary" data-dismiss="modal" id="developer-view">View</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="table-div" style="margin-left: 12px;">
+		<table class="table table-hover table-sm">
+			<thead class="thead-dark">
+			<tr>
+				<th scope="col">Name</th>
+				<th scope="col">Address</th>
+				<th scope="col">Games</th>
+				<th scope="col">Actions</th>
+			</tr>
+			</thead>
+			<tbody id="developer-list"></tbody>
+		</table>
+	</div>
+	<script src="js/developers.js"></script>
+	<script>
+		$("#menu-toggle").click(function(e) {
+			e.preventDefault();
+			$("#wrapper").toggleClass("toggled");
+		});
+	</script>
+</body>
+</html>

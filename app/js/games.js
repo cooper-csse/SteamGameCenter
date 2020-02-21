@@ -1,4 +1,3 @@
-// const remote = require("electron").remote;
 $ = require("jquery");
 require("jquery-validation");
 db = require(__dirname + "/js/routines");
@@ -50,7 +49,7 @@ oldGames = [];
 function displayGames(games) {
 	if (games === undefined) games = oldGames;
 	else oldGames = games;
-	db.getFollowing().then(result => {
+	db.getFollowingGame().then(result => {
 		let following = [];
 		for (let game of result.recordset) following.push(game.ID);
 
@@ -111,9 +110,21 @@ function populatePublishers(publishers) {
 	}
 }
 
+function clearTags() {
+	for (let child of searchData.tags.children()) {
+		let tag = $(child);
+		if (tag.hasClass("btn-secondary")) {
+			tag.removeClass("btn-secondary");
+			tag.addClass("btn-outline-secondary");
+		}
+	}
+}
+
 function clickTag(id) {
 	let tag = $(`#tag-${id}`);
 	tag.blur();
+	clearTags();
+	searchData.tags.trigger("click");
 	if (tag.hasClass("btn-outline-secondary")) {
 		tag.removeClass("btn-outline-secondary");
 		tag.addClass("btn-secondary");
@@ -134,35 +145,25 @@ function showModal(id="") {
 		gameData.sale.html(game.Sale == 0 ? "" : (game.Sale * 100).toFixed(0) + '%');
 		gameModal.modal();
 	});
-	console.log(db.getUsername());
 }
 
 function reload() {
-	(browseMode ? db.getGames() : db.getFollowing()).then(result => {
+	(browseMode ? db.getGames() : db.getFollowingGame()).then(result => {
 		displayGames(result.recordset);
 	});
 }
 
 function addFollowing(id="") {
-	db.addFollowing(id).then(result => {
+	db.addFollowingGame(id).then(result => {
 		displayGames();
 	});
 }
 
 function removeFollowing(id="") {
-	db.removeFollowing(id).then(result => {
+	db.removeFollowingGame(id).then(result => {
 		displayGames();
 	});
 }
-
-// gameList.on("click", e => {
-// 	let g = $(e.target.parentElement);
-// 	console.log(g);
-// 	console.log(g.attr("id").substr(12));
-// 	if (g.hasClass("action-info")) {
-// 		showModal(g.attr("id").substr(12));
-// 	}
-// });
 
 $("#reload").on("click", e => {
 	reload();
@@ -180,25 +181,29 @@ $("#mode-game-following").on("click", e => {
 	reload();
 });
 
+$("#mode-developer-browse").on("click", e => {
+	$("#wrapper").toggleClass("toggled");
+	window.location = "developers.html";
+});
+
+$("#mode-developer-following").on("click", e => {
+	$("#wrapper").toggleClass("toggled");
+	window.location = "developers.html?following=true";
+});
+
 $("#logout").on("click", e => {
 	db.setUsername(undefined);
 	window.location = "index.html";
 });
 
 $("#search-tag-clear").on("click", e => {
-	for (let child of searchData.tags.children()) {
-		let tag = $(child);
-		if (tag.hasClass("btn-secondary")) {
-			tag.removeClass("btn-secondary");
-			tag.addClass("btn-outline-secondary");
-		}
-	}
+	clearTags();
 });
 
 $("#search-submit").on("click", e => {
 	searchData.modal.modal("hide");
 	if (searchData.tabs.basic.hasClass("active")) {
-		db.basicSearch(searchData.title.val()).then(result => {
+		db.basicSearchGames(searchData.title.val()).then(result => {
 			displayGames(result.recordset);
 		});
 		return;
@@ -213,13 +218,14 @@ $("#search-submit").on("click", e => {
 		return active;
 	};
 	let data = {
-		tags: (() => {
-			let active = [];
+		tag: (() => {
 			for (let child of searchData.tags.children()) {
 				let tag = $(child);
-				if (tag.hasClass("btn-secondary")) active.push(tag.html());
+				if (tag.hasClass("btn-secondary")) {
+					return tag.html();
+				}
 			}
-			return active;
+			return "";
 		})(),
 		date: {
 			from: searchData.date.from.val(),
@@ -249,18 +255,54 @@ $("#search-submit").on("click", e => {
 		if (Number(seg[1]) < 0 || Number(seg[1]) > 12) return;
 		if (Number(seg[2]) < 0 || Number(seg[2]) > 31) return;
 	}
-	db.advancedSearch(data).then(result => {
+	db.advancedSearchGames(data).then(result => {
 		displayGames(result.recordset);
 	})
 });
 
-reload();
+loc = window.location.href.split('?');
+tags = {};
+if (loc.length !== 1) {
+	let getList = loc[1].split('&');
+	for (let get of getList) {
+		let split = get.split('=');
+		tags[split[0]] = decodeURI(split[1]);
+	}
+}
+
+if ("following" in tags) browseMode = false;
+if ("developer" in tags) {
+	let data = {
+		tag: "",
+		date: {
+			from: "",
+			to: "",
+		},
+		price: {
+			from: "",
+			to: "",
+		},
+		rating: {
+			positive: false,
+			good: false,
+			mixed: false,
+			bad: false,
+			negative: false,
+		},
+		developers: [tags["developer"]],
+		publishers: ""
+	};
+	db.advancedSearchGames(data).then(result => {
+		displayGames(result.recordset);
+	})
+} else reload();
+
 db.getTags().then(result => {
 	populateTags(result.recordset);
 });
-db.getDevelopers().then(result => {
+db.getDevelopersAlphabetical().then(result => {
 	populateDevelopers(result.recordset);
 });
-db.getPublishers().then(result => {
+db.getPublishersAlphabetical().then(result => {
 	populatePublishers(result.recordset);
 });

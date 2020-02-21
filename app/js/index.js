@@ -35,7 +35,7 @@ $("button#signup-submit").on("click", (e) => {
 		} else {
 			db.addUser(username, password).then(res => {
 				db.setUsername(username);
-				window.location = "menu.html";
+				window.location = "games.html";
 			});
 		}
 	});
@@ -66,7 +66,7 @@ $("button#login-submit").on("click", (e) => {
 			loginError.html("Incorrect username or password entered");
 		} else {
 			db.setUsername(username);
-			window.location = "menu.html";
+			window.location = "games.html";
 		}
 	});
 });

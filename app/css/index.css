@@ -91,7 +91,7 @@ div.col-sm {
 	user-select: none;
 }
 
-.game-action {
+.game-action, .developer-action {
 	padding-top: 0px;
 	padding-bottom: 1px;
 	padding-left: 6px;
