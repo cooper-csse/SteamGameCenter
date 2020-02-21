@@ -96,6 +96,15 @@
 									</div>
 								</div>
 								<div class="search-heading">
+									<label>Price</label>
+									<div class="input-group input-group-sm">
+										<div class="input-group-prepend"><span class="input-group-text">From</span></div>
+										<input id="search-sale-from" placeholder="0" type="number" min="0" max="100" aria-label="From" class="form-control">
+										<div class="input-group-prepend"><span class="input-group-text">To</span></div>
+										<input id="search-sale-to" placeholder="100" type="number" min="0" max="100" aria-label="To" class="form-control">
+									</div>
+								</div>
+								<div class="search-heading">
 									<label>Rating</label>
 									<div class="custom-control custom-checkbox" style="text-align: center">
 										<div class="form-check form-check-inline row">
@@ -154,8 +163,57 @@
 					<h5><span class="badge badge-secondary" id="game-date"></span></h5>
 				</div>
 				<form>
-					<div class="modal-body">
-						<div id="game-description"></div>
+					<div class="modal-body pre-scrollable" style="max-height: 150px;">
+						<div class="search-heading">
+							<label>Description</label>
+							<div id="game-description"></div>
+						</div>
+						<div class="search-heading">
+							<label>Publisher</label>
+							<div style="text-align: center"><span id="game-publisher"></span></div>
+						</div>
+						<div class="search-heading">
+							<label>Developer</label>
+							<div style="text-align: center"><button id="game-developer" class="btn btn-outline-info"></button></div>
+						</div>
+						<div class="search-heading">
+							<label>License</label>
+							<div class="table-div" style="margin-left: 12px;">
+								<table class="table table-hover table-sm">
+									<thead class="thead-dark">
+									<tr>
+										<th scope="col">Instantiated</th>
+										<th scope="col">Valid until</th>
+									</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td id="game-license-from"></td>
+											<td id="game-license-to"></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="search-heading row">
+							<div class="col"><label>Overall Rating</label></div>
+							<div class="col" style="text-align: right"><span id="game-rating"></span></div>
+						</div>
+						<div class="search-heading">
+							<label>Reviews</label>
+							<div class="table-div" style="margin-left: 12px;">
+								<table class="table table-hover table-sm">
+									<thead class="thead-dark">
+										<tr>
+											<th scope="col">Liked</th>
+											<th scope="col" style="width: 100px;">Date</th>
+											<th scope="col">Content</th>
+										</tr>
+									</thead>
+									<tbody id="game-reviews"></tbody>
+								</table>
+							</div>
+						</div>
 					</div>
 					<div class="modal-footer">
 						<h5><span class="badge badge-pill badge-success" id="game-sale"></span></h5>

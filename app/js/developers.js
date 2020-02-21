@@ -137,6 +137,10 @@ function removeFollowing(id="") {
 }
 
 $("#reload").on("click", e => {
+	searchData.name.val("");
+	searchData.address.val("");
+	searchData.games.from.val("");
+	searchData.games.to.val("");
 	reload();
 });
 
@@ -186,7 +190,7 @@ $("#search-submit").on("click", e => {
 		return;
 	}
 	let data = {
-		address: searchData.name.val(),
+		address: searchData.address.val(),
 		games: {
 			from: searchData.games.from.val(),
 			to: searchData.games.to.val(),
@@ -208,9 +212,12 @@ if (loc.length !== 1) {
 }
 
 if ("following" in tags) browseMode = false;
+if ("developer" in tags) {
+	db.basicSearchDev(tags["developer"]).then(result => {
+		displayDevelopers(result.recordset);
+	});
+} else reload();
 
 $("#developer-view").on("click", e => {
 	window.location = `games.html?developer=${selectedDeveloper}`;
 });
-
-reload();

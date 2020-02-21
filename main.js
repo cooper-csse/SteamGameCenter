@@ -12,6 +12,7 @@ const createMainWindow = async () => {
 		height: 400,
 		autoHideMenuBar: true,
 		backgroundColor: "#424242",
+		resizable: false,
 		webPreferences: {
 			nodeIntegration: true,
 			nodeIntegrationInWorker: true

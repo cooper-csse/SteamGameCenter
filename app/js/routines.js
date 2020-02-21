@@ -232,6 +232,25 @@ module.exports = {
 			console.error('SQL error', e);
 		}
 	},
+	getGameDeveloperPublisherLicense: async function(id) {
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(`
+				SELECT d.Name as [Developer], p.Name as [Publisher], l.StartDate as [Start], l.EndDate as [End]
+					FROM Game g
+					JOIN Developer d on g.Developer = d.ID
+					JOIN Publisher p on g.Publisher = p.ID
+					JOIN License l on p.LiscenseID = l.ID
+					WHERE g.ID = '${id}'
+			`);
+			return await result.then(res => {
+				return res;
+			});
+		} catch (e) {
+			console.error('SQL error', e);
+		}
+	},
 	basicSearchGames: async function(title) {
 		if (verify([title])) throw new Error("SQL injection");
 		await pool.constructor;
@@ -254,6 +273,7 @@ module.exports = {
 				${data.publishers.length > 0 ? "JOIN Publisher p on g.Publisher = p.ID" : ""}
 				${data.tag !== "" ? "JOIN HasTag ht on g.ID = ht.GameID" : ""}
 				${data.tag !== "" ? "JOIN Tag t on ht.TagID = t.ID" : ""}
+				${(data.rating.positive || data.rating.good || data.rating.mixed || data.rating.bad || data.rating.negative) ? "JOIN GamesWithRatings r ON g.ID = r.Game" : ""}
 		`;
 		let c = [];
 		if (data.tag !== "") c.push(`t.Name = '${data.tag}'`);
@@ -261,6 +281,8 @@ module.exports = {
 		if (data.date.to !== "") c.push(`g.Release <= '${data.date.to}'`);
 		if (data.price.from !== "") c.push(`g.Price >= '${data.price.from}'`);
 		if (data.price.to !== "") c.push(`g.Price <= '${data.price.to}'`);
+		if (data.sale.from !== "") c.push(`g.Sale >= ${data.sale.from / 100.0}`);
+		if (data.sale.to !== "") c.push(`g.Sale <= ${data.sale.to / 100.0}`);
 		if (data.developers.length > 0) {
 			let developers = [];
 			for (let developer of data.developers) developers.push(`d.Name = '${developer}'`);
@@ -271,6 +293,13 @@ module.exports = {
 			for (let publisher of data.publishers) publishers.push(`p.Name = '${publisher}'`);
 			c.push('(' + publishers.join(" OR ") + ')');
 		}
+		let rating = [];
+		if (data.rating.positive) rating.push("r.Score > 80 AND r.Score <= 100");
+		if (data.rating.good) rating.push("r.Score > 60 AND r.Score <= 80");
+		if (data.rating.mixed) rating.push("r.Score > 40 AND r.Score <= 60");
+		if (data.rating.bad) rating.push("r.Score > 20 AND r.Score <= 40");
+		if (data.rating.negative) rating.push("r.Score >= 0 AND r.Score <= 20");
+		if (rating.length !== 0) c.push('(' + rating.join(" OR ") + ')');
 		if (c.length !== 0) query += ` WHERE ${c.join(" AND ")}`;
 		query += " ORDER BY g.Title ASC";
 		await pool.constructor;
@@ -289,7 +318,7 @@ module.exports = {
 		await pool.constructor;
 		try {
 			const request = pool.request();
-			const result = request.query(`SELECT * FROM DevelopersAlphabetical WHERE Name LIKE '%${name}%'`);
+			const result = request.query(`SELECT * FROM DeveloperData WHERE Name LIKE '%${name}%' ORDER BY Name ASC`);
 			return await result.then(res => {
 				return res;
 			});
@@ -301,7 +330,7 @@ module.exports = {
 		if (verify([data.address])) throw new Error("SQL injection");
 		let query = `SELECT * FROM DeveloperData`;
 		let c = [];
-		if (data.address !== "") c.push(`Address LIKE '${data.Address}'`);
+		if (data.address !== "") c.push(`Address LIKE '%${data.address}%'`);
 		if (data.games.from !== "") c.push(`Games >= '${data.games.from}'`);
 		if (data.games.to !== "") c.push(`Games <= '${data.games.to}'`);
 		if (c.length !== 0) query += ` WHERE ${c.join(" AND ")}`;
@@ -310,6 +339,32 @@ module.exports = {
 		try {
 			const request = pool.request();
 			const result = request.query(query);
+			return await result.then(res => {
+				return res;
+			});
+		} catch (e) {
+			console.error('SQL error', e);
+		}
+	},
+	getReviews: async function(id) {
+		if (verify([id])) throw new Error("SQL injection");
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(`SELECT * FROM Review WHERE Game='${id}'`);
+			return await result.then(res => {
+				return res;
+			});
+		} catch (e) {
+			console.error('SQL error', e);
+		}
+	},
+	getReviewRate: async function(id) {
+		if (verify([id])) throw new Error("SQL injection");
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(`SELECT * From GamesWithRatings WHERE Game='${id}'`);
 			return await result.then(res => {
 				return res;
 			});

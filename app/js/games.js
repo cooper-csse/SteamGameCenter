@@ -14,7 +14,15 @@ gameData = {
 	date: $("#game-date"),
 	description: $("#game-description"),
 	price: $("#game-price"),
-	sale: $("#game-sale")
+	sale: $("#game-sale"),
+	publisher: $("#game-publisher"),
+	developer: $("#game-developer"),
+	license: {
+		from: $("#game-license-from"),
+		to: $("#game-license-to")
+	},
+	rating: $("#game-rating"),
+	reviews: $("#game-reviews")
 };
 
 searchData = {
@@ -33,6 +41,10 @@ searchData = {
 		from: $("#search-price-from"),
 		to: $("#search-price-to")
 	},
+	sale: {
+		from: $("#search-sale-from"),
+		to: $("#search-sale-to")
+	},
 	rating: {
 		positive: $("#search-rating-positive"),
 		good: $("#search-rating-good"),
@@ -45,6 +57,7 @@ searchData = {
 };
 
 oldGames = [];
+selectedDeveloper = "";
 
 function displayGames(games) {
 	if (games === undefined) games = oldGames;
@@ -142,8 +155,36 @@ function showModal(id="") {
 		gameData.date.html(date.toISOString().substr(0, 10));
 		gameData.description.html(game.Description);
 		gameData.price.html('$' + game.Price);
-		gameData.sale.html(game.Sale == 0 ? "" : (game.Sale * 100).toFixed(0) + '%');
-		gameModal.modal();
+		gameData.sale.html(game.Sale === 0 ? "" : (game.Sale * 100).toFixed(0) + '%');
+		gameData.reviews.empty();
+		db.getReviews(id).then(result => {
+			for (let review of result.recordset) {
+				gameData.reviews.append(`
+					<tr class="game" id="game-${game.ID}">
+						<td class="thumb text-${review.Score ? "success" : "danger"}"><i class="fas fa-thumbs-${review.Score ? "up" : "down"}"></i></td>
+						<td>${new Date(review.Date).toISOString().substr(0, 10)}</td>
+						<td>${review.Content}</td>
+					</tr>
+				`);
+			}
+			db.getGameDeveloperPublisherLicense(id).then(result => {
+				let data = result.recordset[0];
+				selectedDeveloper = data.Developer;
+				gameData.publisher.html(data.Publisher);
+				gameData.developer.html(data.Developer);
+				gameData.license.from.html(new Date(data.Start).toISOString().substr(0, 10));
+				gameData.license.to.html(new Date(data.End).toISOString().substr(0, 10));
+				db.getReviewRate(game.ID).then(result => {
+					let rating = result.recordset[0].Score;
+					if (rating > 80 && rating <= 100) gameData.rating.html("Positive");
+					else if (rating > 60 && rating <= 80) gameData.rating.html("Good");
+					else if (rating > 40 && rating <= 60) gameData.rating.html("Mixed");
+					else if (rating > 20 && rating <= 40) gameData.rating.html("Bad");
+					else if (rating >= 0 && rating <= 20) gameData.rating.html("Negative");
+					gameModal.modal();
+				});
+			});
+		});
 	});
 }
 
@@ -166,6 +207,24 @@ function removeFollowing(id="") {
 }
 
 $("#reload").on("click", e => {
+	clearTags();
+	searchData.title.val("");
+	searchData.date.from.val("");
+	searchData.date.to.val("");
+	searchData.price.from.val("");
+	searchData.price.to.val("");
+	searchData.sale.from.val("");
+	searchData.sale.to.val("");
+	searchData.rating.positive.prop("checked", false);
+	searchData.rating.good.prop("checked", false);
+	searchData.rating.mixed.prop("checked", false);
+	searchData.rating.bad.prop("checked", false);
+	searchData.rating.negative.prop("checked", false);
+	for (let list of [searchData.developers, searchData.publishers]) {
+		for (let child of list.children()) {
+			$($(child).children()[0]).prop("checked", false);
+		}
+	}
 	reload();
 });
 
@@ -235,6 +294,10 @@ $("#search-submit").on("click", e => {
 			from: searchData.price.from.val(),
 			to: searchData.price.to.val(),
 		},
+		sale: {
+			from: searchData.sale.from.val(),
+			to: searchData.sale.to.val(),
+		},
 		rating: {
 			positive: searchData.rating.positive.is(":checked"),
 			good: searchData.rating.good.is(":checked"),
@@ -260,6 +323,11 @@ $("#search-submit").on("click", e => {
 	})
 });
 
+gameData.developer.on("click", e => {
+	e.preventDefault();
+	window.location = `developers.html?developer=${selectedDeveloper}`;
+});
+
 loc = window.location.href.split('?');
 tags = {};
 if (loc.length !== 1) {
@@ -279,6 +347,10 @@ if ("developer" in tags) {
 			to: "",
 		},
 		price: {
+			from: "",
+			to: "",
+		},
+		sale: {
 			from: "",
 			to: "",
 		},
