@@ -13,6 +13,9 @@ function verify(params=[]) {
 }
 
 module.exports = {
+	isConnected: function() {
+		return pool.connected;
+	},
 	getUsername: function() {
 		return pool.user;
 	},

@@ -20,7 +20,10 @@ $("button#signup-submit").on("click", (e) => {
 	e.preventDefault();
 	let username = $("#signup-username").val();
 	let password = $("#signup-password").val();
-	if (username === "" || password === "") {
+	if (!db.isConnected()) {
+		signupError.html("Connected to database failed");
+		return;
+	} else if (username === "" || password === "") {
 		signupError.removeClass(["badge-danger", "badge-warning"]);
 		signupError.addClass("badge-warning");
 		signupError.html("Fields cannot be left blank");
@@ -55,7 +58,10 @@ $("button#login-submit").on("click", (e) => {
 	e.preventDefault();
 	let username = $("#login-username").val();
 	let password = $("#login-password").val();
-	if (username === "" || password === "") {
+	if (!db.isConnected()) {
+		loginError.html("Connected to database failed");
+		return;
+	} else if (username === "" || password === "") {
 		loginError.removeClass(["badge-danger", "badge-warning"]);
 		loginError.addClass("badge-warning");
 		loginError.html("Fields cannot be left blank");
