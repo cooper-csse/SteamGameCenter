@@ -25,6 +25,9 @@ $("button#signup-submit").on("click", (e) => {
 		signupError.addClass("badge-warning");
 		signupError.html("Fields cannot be left blank");
 		return;
+	} else if (username.length > 20) {
+		signupError.html("Username must be less than 20 characters");
+		return;
 	}
 
 	db.doesUserExist(username).then(success => {
