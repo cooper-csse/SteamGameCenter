@@ -1,6 +1,7 @@
 $ = require("jquery");
 require("jquery-validation");
 db = require(__dirname + "/js/routines");
+download = require(__dirname + "/js/download");
 require("bootstrap");
 require("popper.js");
 
@@ -17,6 +18,8 @@ developerData = {
 
 searchData = {
 	modal: $("#search-modal"),
+	progressBar: $("#progress-bar"),
+	progressContainer: $("#progress-container"),
 	tabs: {
 		basic: $("#tabs-search-basic"),
 		advanced: $("#tabs-search-advanced")
@@ -109,7 +112,6 @@ function clickTag(id) {
 function showModal(id="") {
 	db.getDeveloperDetails(id).then(result => {
 		let developer = result.recordset[0];
-		let date = new Date(developer.Release);
 		selectedDeveloper = developer.Name;
 		developerData.name.html(developer.Name);
 		developerData.address.html(developer.Address);
@@ -136,12 +138,16 @@ function removeFollowing(id="") {
 	});
 }
 
-$("#reload").on("click", e => {
+function clear() {
 	searchData.name.val("");
 	searchData.address.val("");
 	searchData.games.from.val("");
 	searchData.games.to.val("");
 	reload();
+}
+
+$("#reload").on("click", e => {
+	clear();
 });
 
 $("#mode-game-browse").on("click", e => {
@@ -217,6 +223,64 @@ if ("developer" in tags) {
 		displayDevelopers(result.recordset);
 	});
 } else reload();
+
+db.isUserAdmin(db.getUsername()).then(result => {
+	if (!result) return;
+	$("#admin-tools").empty().append(`	
+		<a href="#" class="list-group-item list-group-item-action bg-dark">
+			<h4>Data</h4>
+			<div class="btn-group" role="group" aria-label="Basic example">
+				<button id="mode-data-import" type="button" class="btn btn-sm btn-secondary">Import</button>
+				<button id="mode-data-export" type="button" class="btn btn-sm btn-secondary">Export</button>
+			</div>
+		</a>
+	`);
+
+	$("#mode-data-import").on("click", e=> {
+		download.import().then(async result => {
+			let data = JSON.parse(result);
+			try {
+				searchData.progressBar.removeClass("bg-danger");
+				searchData.progressBar.removeClass("bg-success");
+				searchData.progressBar.addClass("bg-primary");
+				searchData.progressBar.addClass("progress-bar-animated");
+				searchData.progressContainer.fadeIn();
+				searchData.progressBar.width("0%");
+				let count = data.games.length + data.login.length;
+				let i = 0.0;
+				for (let game of data.games) {
+					i++;
+					searchData.progressBar.width(100 * i / count + "%");
+					await db.importGame(game);
+				}
+				for (let login of data.login) {
+					i++;
+					searchData.progressBar.width(100 * i / count + "%");
+					await db.importLogin(login);
+				}
+				searchData.progressBar.width("100%");
+				searchData.progressBar.removeClass("bg-primary");
+				searchData.progressBar.removeClass("progress-bar-animated");
+				searchData.progressBar.addClass("bg-success");
+				setTimeout(() => {
+					searchData.progressContainer.fadeOut();
+				}, 500);
+				clear();
+			} catch (e) {
+				searchData.progressBar.removeClass("bg-primary");
+				searchData.progressBar.removeClass("progress-bar-animated");
+				searchData.progressBar.addClass("bg-danger");
+				throw new Error(e.message);
+			}
+		});
+	});
+
+	$("#mode-data-export").on("click", e => {
+		db.getExport().then(result => {
+			download.export(JSON.stringify(result));
+		});
+	});
+});
 
 $("#developer-view").on("click", e => {
 	window.location = `games.html?developer=${selectedDeveloper}`;

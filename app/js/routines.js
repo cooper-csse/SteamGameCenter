@@ -12,6 +12,32 @@ function verify(params=[]) {
 	return false;
 }
 
+getExportGames = async function() {
+	await pool.constructor;
+	try {
+		const request = pool.request();
+		const result = request.query(`SELECT * From ExportGamesView`);
+		return await result.then(res => {
+			return res;
+		});
+	} catch (e) {
+		throw new Error(e.message);
+	}
+};
+
+getExportLogin = async function() {
+	await pool.constructor;
+	try {
+		const request = pool.request();
+		const result = request.query(`SELECT * From ExportLoginView`);
+		return await result.then(res => {
+			return res;
+		});
+	} catch (e) {
+		throw new Error(e.message);
+	}
+};
+
 module.exports = {
 	isConnected: function() {
 		return pool.connected;
@@ -33,7 +59,20 @@ module.exports = {
 				return res.recordset.length !== 0;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
+		}
+	},
+	isUserAdmin: async function(username) {
+		if (verify([username])) throw new Error("SQL injection");
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(`SELECT * FROM Login WHERE Username='${username}'`);
+			return await result.then(res => {
+				return res.recordset[0].Admin === 1;
+			});
+		} catch (e) {
+			throw new Error(e.message);
 		}
 	},
 	doesPasswordMatch: async function(username, password) {
@@ -47,7 +86,7 @@ module.exports = {
 				return res.recordset[0].Password === hashing.hashPassword(password, res.recordset[0].Salt);
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	addUser: async function(username, password) {
@@ -57,12 +96,12 @@ module.exports = {
 		await pool.constructor;
 		try {
 			const request = pool.request();
-			const result = request.query(`INSERT INTO Login VALUES('${username}', '${hash}', '${salt}')`);
+			const result = request.query(`INSERT INTO Login VALUES('${username}', '${hash}', '${salt}', 0)`);
 			return await result.then(res => {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	getGames: async function() {
@@ -72,7 +111,7 @@ module.exports = {
 			const result = request.query(`SELECT * FROM GamesAlphabetical`);
 			return await result;
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	getGameDetails: async function(id) {
@@ -85,7 +124,7 @@ module.exports = {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	getDevelopers: async function() {
@@ -95,7 +134,7 @@ module.exports = {
 			const result = request.query(`SELECT * FROM DeveloperData`);
 			return await result;
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	getDeveloperDetails: async function(id) {
@@ -108,7 +147,7 @@ module.exports = {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	getFollowingGame: async function() {
@@ -124,7 +163,7 @@ module.exports = {
 			`);
 			return await result;
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	addFollowingGame: async function(id) {
@@ -138,7 +177,7 @@ module.exports = {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	removeFollowingGame: async function(id) {
@@ -152,7 +191,7 @@ module.exports = {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	getFollowingDev: async function() {
@@ -168,7 +207,7 @@ module.exports = {
 			`);
 			return await result;
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	addFollowingDev: async function(id) {
@@ -182,7 +221,7 @@ module.exports = {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	removeFollowingDev: async function(id) {
@@ -196,7 +235,7 @@ module.exports = {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	getTags: async function() {
@@ -208,7 +247,7 @@ module.exports = {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	getDevelopersAlphabetical: async function() {
@@ -220,7 +259,7 @@ module.exports = {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	getPublishersAlphabetical: async function() {
@@ -232,7 +271,7 @@ module.exports = {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	getGameDeveloperPublisherLicense: async function(id) {
@@ -244,14 +283,14 @@ module.exports = {
 					FROM Game g
 					JOIN Developer d on g.Developer = d.ID
 					JOIN Publisher p on g.Publisher = p.ID
-					JOIN License l on p.LiscenseID = l.ID
+					JOIN License l on p.LicenseID = l.ID
 					WHERE g.ID = '${id}'
 			`);
 			return await result.then(res => {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	basicSearchGames: async function(title) {
@@ -264,7 +303,7 @@ module.exports = {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	advancedSearchGames: async function(data) {
@@ -313,7 +352,7 @@ module.exports = {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	basicSearchDev: async function(name) {
@@ -326,7 +365,7 @@ module.exports = {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	advancedSearchDev: async function(data) {
@@ -346,7 +385,7 @@ module.exports = {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	getReviews: async function(id) {
@@ -359,7 +398,7 @@ module.exports = {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
 		}
 	},
 	getReviewRate: async function(id) {
@@ -372,7 +411,43 @@ module.exports = {
 				return res;
 			});
 		} catch (e) {
-			console.error('SQL error', e);
+			throw new Error(e.message);
+		}
+	},
+	getExport: async function() {
+		let result = {};
+		await getExportGames().then(async resultGames => {
+			await getExportLogin().then(resultLogin => {
+				result.games = resultGames.recordset;
+				result.login = resultLogin.recordset;
+			});
+		});
+		return result;
+	},
+	importGame: async function (game) {
+		// if (verify([game.GameTitle, game.GamePrice, game.GameSale, game.GameRelease, game.GameDescription, game.DevName, game.DevAddress, game.PubName, game.LicenseStart, game.LicenseEnd, game.Tag, game.ReviewScore, game.ReviewDate, game.ReviewContent])) throw new Error("SQL injection");
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(`EXEC importGameData '${game.GameTitle}', '${game.GamePrice}', '${game.GameSale}', '${game.GameRelease}', '${game.GameDescription}', '${game.DevName}', '${game.DevAddress}', '${game.PubName}', '${game.LicenseStart}', '${game.LicenseEnd}', '${game.Tag}', '${game.ReviewScore}', '${game.ReviewDate}', '${game.ReviewContent}'`);
+			return await result.then(res => {
+				return res;
+			});
+		} catch (e) {
+			throw new Error(e.message);
+		}
+	},
+	importLogin: async function(login) {
+		// if (verify([login.Username, login.Password, login.Salt, login.Admin, login.FollowDev, login.FollowGame])) throw new Error("SQL injection");
+		await pool.constructor;
+		try {
+			const request = pool.request();
+			const result = request.query(`EXEC importLoginData '${login.Username}', '${login.Password}', '${login.Salt}', '${login.Admin}', '${login.FollowDev}', '${login.FollowGame}'`);
+			return await result.then(res => {
+				return res;
+			});
+		} catch (e) {
+			throw new Error(e.message);
 		}
 	}
 };
