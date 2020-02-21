@@ -78,8 +78,8 @@ function displayGames(games) {
 			gameList.append(`
 				<tr class="game" id="game-${game.ID}">
 					<td>${game.Title}</td>
-					<td>${game.Price}</td>
-					<td>${Number(game.Sale).toFixed(2)}</td>
+					<td style="text-align: right;">${game.Price}</td>
+					<td style="text-align: right;">${Number(game.Sale * 100).toFixed(0) + '%'}</td>
 					<td>${date.toISOString().substr(0, 10)}</td>
 					<td>
 						<button onclick="showModal('${game.ID}')" class="action-info game-action btn btn-sm btn-outline-info"><i class="fas fa-info"></i></button>
@@ -413,6 +413,7 @@ db.isUserAdmin(db.getUsername()).then(result => {
 				searchData.progressBar.removeClass("bg-primary");
 				searchData.progressBar.removeClass("progress-bar-animated");
 				searchData.progressBar.addClass("bg-success");
+				$("#wrapper").removeClass("toggled");
 				setTimeout(() => {
 					searchData.progressContainer.fadeOut();
 				}, 500);

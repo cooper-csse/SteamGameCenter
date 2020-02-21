@@ -262,6 +262,7 @@ db.isUserAdmin(db.getUsername()).then(result => {
 				searchData.progressBar.removeClass("bg-primary");
 				searchData.progressBar.removeClass("progress-bar-animated");
 				searchData.progressBar.addClass("bg-success");
+				$("#wrapper").removeClass("toggled");
 				setTimeout(() => {
 					searchData.progressContainer.fadeOut();
 				}, 500);
